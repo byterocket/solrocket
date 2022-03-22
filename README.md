@@ -1,5 +1,5 @@
 <h1 align=center><code>
-solrocket
+🚀 solrocket 🚀
 </code></h1>
 
 A set of opinionated smart contracts.
