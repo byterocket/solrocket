@@ -1,11 +1,14 @@
+.PHONY: clean
 clean: ## Remove build artifacts
 	@forge clean
 
+.PHONY: build
 build: ## Build project
-	forge build
+	@forge build
 
+.PHONY: test
 test: ## Run testsuite
-	forge test -vvv
+	@forge test -vvv
 
 .PHONY: help
 help:
