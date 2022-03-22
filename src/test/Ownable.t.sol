@@ -10,62 +10,66 @@ contract OwnableTest is DSTest {
     HEVM internal constant EVM = HEVM(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
 
     // SuT
-    OwnableMock ownable;
+    OwnableMock sut;
 
     function setUp() public {
-        ownable = new OwnableMock();
+        sut = new OwnableMock();
     }
 
     function testDeploymentInvariants() public {
-        assertEq(ownable.owner(), address(this));
-        assertEq(ownable.pendingOwner(), address(0));
+        assertEq(sut.owner(), address(this));
+        assertEq(sut.pendingOwner(), address(0));
     }
 
-    function testFailModifierOnlyOwner(address caller) public {
-        if (caller == ownable.owner()) return;
+    function testModifier() public {
+        sut.onlyCallableByOwner();
+    }
+
+    function testFailModifier(address caller) public {
+        if (caller == sut.owner()) return;
 
         // Fails with OnlyCallableByOwner.
         EVM.prank(caller);
-        ownable.onlyCallableByOwner();
+        sut.onlyCallableByOwner();
     }
 
     function testSetPendingOwner(address to) public {
-        if (to == ownable.owner()) return;
+        if (to == sut.owner()) return;
 
-        ownable.setPendingOwner(to);
-        assertEq(ownable.pendingOwner(), to);
+        sut.setPendingOwner(to);
+        assertEq(sut.pendingOwner(), to);
     }
 
     function testFailSetPendingOwnerByNonOwner(address caller, address to) public {
-        if (to == ownable.owner()) return;
+        if (to == sut.owner()) return;
 
         // Fails with OnlyCallableByOwner.
         EVM.prank(caller);
-        ownable.setPendingOwner(to);
+        sut.setPendingOwner(to);
     }
 
     function testFailSetPendingOwnerToCurrentOwner() public {
         // Fails with InvalidPendingOwner.
-        ownable.setPendingOwner(ownable.owner());
+        sut.setPendingOwner(sut.owner());
     }
 
     function testAcceptOwnership(address pendingOwner) public {
-        if (pendingOwner == ownable.owner()) return;
+        if (pendingOwner == sut.owner()) return;
 
-        ownable.setPendingOwner(pendingOwner);
+        sut.setPendingOwner(pendingOwner);
 
         EVM.prank(pendingOwner);
-        ownable.acceptOwnership();
+        sut.acceptOwnership();
 
-        assertEq(ownable.owner(), pendingOwner);
-        assertEq(ownable.pendingOwner(), address(0));
+        assertEq(sut.owner(), pendingOwner);
+        assertEq(sut.pendingOwner(), address(0));
     }
 
     function testFailAcceptOwnershipByNonPendingOwner(address caller) public {
-        if (caller == ownable.pendingOwner()) return;
+        if (caller == sut.pendingOwner()) return;
 
         // Fails with OnlyCallableByPendingOwner.
         EVM.prank(caller);
-        ownable.acceptOwnership();
+        sut.acceptOwnership();
     }
 }

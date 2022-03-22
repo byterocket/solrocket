@@ -2,7 +2,7 @@
 pragma solidity 0.8.10;
 
 /**
- * @title Ownable contract using Two-Step Ownership Transfer pattern.
+ * @title Ownable contract using Two-Step Ownership Transfer pattern
  *
  * @dev Contract module which provides a basic access controler mechanism,
  *      where there is an account (an owner) that can be granted exclusive
@@ -29,25 +29,6 @@ pragma solidity 0.8.10;
 abstract contract Ownable {
 
     //--------------------------------------------------------------------------
-    // Storage
-
-    /// @notice The contract's owner.
-    address public owner;
-
-    /// @notice The contract's pending owner.
-    address public pendingOwner;
-
-    //--------------------------------------------------------------------------
-    // Events
-
-    /// @notice Event emitted when new pending owner set.
-    event NewPendingOwner(address indexed previousPendingOwner,
-                          address indexed newPendingOwner);
-
-    /// @notice Event emitted when new owner set.
-    event NewOwner(address indexed previousOwner, address indexed newOwner);
-
-    //--------------------------------------------------------------------------
     // Errors
 
     /// @notice Function is only callable by contract's owner.
@@ -60,8 +41,20 @@ abstract contract Ownable {
     error InvalidPendingOwner();
 
     //--------------------------------------------------------------------------
+    // Events
+
+    /// @notice Event emitted when new pending owner set.
+    event NewPendingOwner(address indexed previousPendingOwner,
+                          address indexed newPendingOwner);
+
+    /// @notice Event emitted when new owner set.
+    event NewOwner(address indexed previousOwner, address indexed newOwner);
+
+    //--------------------------------------------------------------------------
     // Modifiers
 
+    /// @notice Modifier to guarantee function is only callable by contract's
+    ///         owner.
     modifier onlyOwner() {
         if (msg.sender != owner) {
             revert OnlyCallableByOwner();
@@ -73,6 +66,15 @@ abstract contract Ownable {
     // contracts should not build authentication upon the pending owner.
 
     //--------------------------------------------------------------------------
+    // Storage
+
+    /// @notice The contract's owner.
+    address public owner;
+
+    /// @notice The contract's pending owner.
+    address public pendingOwner;
+
+    //--------------------------------------------------------------------------
     // Constructor
 
     constructor() {
@@ -81,7 +83,7 @@ abstract contract Ownable {
     }
 
     //--------------------------------------------------------------------------
-    // Mutating Functions
+    // Owner Mutating Functions
 
     /// @notice Set a new pending owner.
     /// @dev Only callable by current owner.
@@ -109,4 +111,5 @@ abstract contract Ownable {
         owner = msg.sender;
         pendingOwner = address(0);
     }
+
 }
