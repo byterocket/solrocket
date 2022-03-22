@@ -13,7 +13,7 @@ pragma solidity 0.8.10;
  *      pending owner can accept the contract's ownership.
  *
  *      Note that the contract's owner can NOT be set to the zero address,
- *      i.e. the contract can not be withoyt ownership.
+ *      i.e. the contract can not be without ownership.
  *
  *      The contract's initial owner is the contract deployer.
  *
@@ -34,8 +34,8 @@ abstract contract Ownable {
     /// @notice The contract's owner.
     address public owner;
 
-    /// @dev The contract's pending owner.
-    address private _pendingOwner;
+    /// @notice The contract's pending owner.
+    address public pendingOwner;
 
     //--------------------------------------------------------------------------
     // Events
@@ -81,14 +81,6 @@ abstract contract Ownable {
     }
 
     //--------------------------------------------------------------------------
-    // View Functions
-
-    /// @notice Returns the current pending owner.
-    function pendingOwner() external view returns (address) {
-        return _pendingOwner;
-    }
-
-    //--------------------------------------------------------------------------
     // Mutating Functions
 
     /// @notice Set a new pending owner.
@@ -100,21 +92,21 @@ abstract contract Ownable {
             revert InvalidPendingOwner();
         }
 
-        emit NewPendingOwner(_pendingOwner, pendingOwner_);
+        emit NewPendingOwner(pendingOwner, pendingOwner_);
 
-        _pendingOwner = pendingOwner_;
+        pendingOwner = pendingOwner_;
     }
 
     /// @notice Accept the contract's ownership as current pending owner.
     /// @dev Only callable by current pending owner.
     function acceptOwnership() external {
-        if (msg.sender != _pendingOwner) {
+        if (msg.sender != pendingOwner) {
             revert OnlyCallableByPendingOwner();
         }
 
         emit NewOwner(owner, msg.sender);
 
         owner = msg.sender;
-        _pendingOwner = address(0);
+        pendingOwner = address(0);
     }
 }
