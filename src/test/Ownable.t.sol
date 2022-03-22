@@ -72,4 +72,5 @@ contract OwnableTest is DSTest {
         EVM.prank(caller);
         sut.acceptOwnership();
     }
+
 }
