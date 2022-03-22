@@ -2,7 +2,7 @@
 🚀 solrocket 🚀
 </code></h1>
 
-A set of opinionated smart contracts.
+A small set of smart contracts.
 
 ## Installation
 
