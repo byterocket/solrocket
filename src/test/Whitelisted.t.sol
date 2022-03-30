@@ -3,21 +3,39 @@ pragma solidity 0.8.10;
 
 import "ds-test/test.sol";
 
+import "forge-std/stdlib.sol";
+import "forge-std/Vm.sol";
+
 import {WhitelistedMock} from "./utils/mocks/WhitelistedMock.sol";
 
-import {HEVM} from "./utils/HEVM.sol";
+/**
+ * Errors library for Whitelisted's custom errors.
+ * Enables checking for errors with vm.expectRevert(Errors.<Error>).
+ */
+library Errors {
+    bytes internal constant OnlyCallableByWhitelistedAddress
+        = abi.encodeWithSignature("OnlyCallableByWhitelistedAddress()");
+}
 
 contract WhitelistedTest is DSTest {
-    HEVM internal constant EVM = HEVM(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
+    Vm internal constant vm = Vm(HEVM_ADDRESS);
 
     // SuT
     WhitelistedMock sut;
+
+    // Events copied from SuT.
+    // Note that the Event declarations are needed to test for emission.
+    event AddressAddedToWhitelist(address indexed who);
+    event AddressRemovedFromWhitelist(address indexed who);
 
     function setUp() public {
         sut = new WhitelistedMock();
     }
 
     function testAddToWhitelist(address who) public {
+        vm.expectEmit(true, true, true, true);
+        emit AddressAddedToWhitelist(who);
+
         sut.addToWhitelist(who);
         // Function should be idempotent.
         sut.addToWhitelist(who);
@@ -28,6 +46,9 @@ contract WhitelistedTest is DSTest {
     function testRemoveFromWhitelist(address who) public {
         sut.addToWhitelist(who);
 
+        vm.expectEmit(true, true, true, true);
+        emit AddressRemovedFromWhitelist(who);
+
         sut.removeFromWhitelist(who);
         // Function should be idempotent.
         sut.removeFromWhitelist(who);
@@ -35,20 +56,20 @@ contract WhitelistedTest is DSTest {
         assertTrue(!sut.whitelist(who));
     }
 
-    function testModifier(address who, bool addToWhitelist) public {
+    function testModifierOnlyWhitelisted(address who, bool addToWhitelist)
+        public
+    {
         if (addToWhitelist) {
             sut.addToWhitelist(who);
 
-            EVM.prank(who);
+            vm.prank(who);
+
             sut.onlyCallableByWhitelistedAddress();
         } else {
-            EVM.prank(who);
+            vm.prank(who);
 
-            try sut.onlyCallableByWhitelistedAddress() {
-                revert();
-            } catch {
-                // Fails with OnlyCallableByWhitelistedAddress.
-            }
+            vm.expectRevert(Errors.OnlyCallableByWhitelistedAddress);
+            sut.onlyCallableByWhitelistedAddress();
         }
     }
 

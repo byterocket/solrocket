@@ -3,14 +3,37 @@ pragma solidity 0.8.10;
 
 import "ds-test/test.sol";
 
-import {HEVM} from "./utils/HEVM.sol";
+import "forge-std/stdlib.sol";
+import "forge-std/Vm.sol";
+
 import {OwnableMock} from "./utils/mocks/OwnableMock.sol";
 
+/**
+ * Errors library for Ownable's custom errors.
+ * Enables checking for errors with vm.expectRevert(Errors.<Error>).
+ */
+library Errors {
+    bytes internal constant OnlyCallableByOwner
+        = abi.encodeWithSignature("OnlyCallableByOwner()");
+
+    bytes internal constant OnlyCallableByPendingOwner
+        = abi.encodeWithSignature("OnlyCallableByPendingOwner()");
+
+    bytes internal constant InvalidPendingOwner
+        = abi.encodeWithSignature("InvalidPendingOwner()");
+}
+
 contract OwnableTest is DSTest {
-    HEVM internal constant EVM = HEVM(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
+    Vm internal constant vm = Vm(HEVM_ADDRESS);
 
     // SuT
     OwnableMock sut;
+
+    // Events copied from SuT.
+    // Note that the Event declarations are needed to test for emission.
+    event NewPendingOwner(address indexed previousPendingOwner,
+                          address indexed newPendingOwner);
+    event NewOwner(address indexed previousOwner, address indexed newOwner);
 
     function setUp() public {
         sut = new OwnableMock();
@@ -21,56 +44,61 @@ contract OwnableTest is DSTest {
         assertEq(sut.pendingOwner(), address(0));
     }
 
-    function testModifier() public {
+    function testModifierOnlyOwner(address caller) public {
+        vm.startPrank(caller);
+
+        // Fail if non-owner tries to call onlyOwner protected function.
+        if (caller != sut.owner()) {
+            vm.expectRevert(Errors.OnlyCallableByOwner);
+            sut.onlyCallableByOwner();
+
+            return;
+        }
+
         sut.onlyCallableByOwner();
     }
 
-    function testFailModifier(address caller) public {
-        if (caller == sut.owner()) return;
+    function testSetPendingOwner(address caller, address to) public {
+        vm.startPrank(caller);
 
-        // Fails with OnlyCallableByOwner.
-        EVM.prank(caller);
-        sut.onlyCallableByOwner();
-    }
+        // Fail if non-owner tries to set pending owner.
+        if (caller != sut.owner()) {
+            vm.expectRevert(Errors.OnlyCallableByOwner);
+            sut.setPendingOwner(to);
 
-    function testSetPendingOwner(address to) public {
-        if (to == sut.owner()) return;
+            return;
+        }
+
+        // Fail if pending owner is set to current owner.
+        if (to == sut.owner()) {
+            vm.expectRevert(Errors.InvalidPendingOwner);
+            sut.setPendingOwner(to);
+
+            return;
+        }
+
+        vm.expectEmit(true, true, true, true);
+        emit NewPendingOwner(address(0), to);
 
         sut.setPendingOwner(to);
         assertEq(sut.pendingOwner(), to);
     }
 
-    function testFailSetPendingOwnerByNonOwner(address caller, address to) public {
-        if (to == sut.owner()) return;
-
-        // Fails with OnlyCallableByOwner.
-        EVM.prank(caller);
-        sut.setPendingOwner(to);
-    }
-
-    function testFailSetPendingOwnerToCurrentOwner() public {
-        // Fails with InvalidPendingOwner.
-        sut.setPendingOwner(sut.owner());
-    }
-
     function testAcceptOwnership(address pendingOwner) public {
-        if (pendingOwner == sut.owner()) return;
+        address owner = sut.owner();
+
+        vm.assume(pendingOwner != owner);
 
         sut.setPendingOwner(pendingOwner);
 
-        EVM.prank(pendingOwner);
+        vm.expectEmit(true, true, true, true);
+        emit NewOwner(owner, pendingOwner);
+
+        vm.prank(pendingOwner);
         sut.acceptOwnership();
 
         assertEq(sut.owner(), pendingOwner);
         assertEq(sut.pendingOwner(), address(0));
-    }
-
-    function testFailAcceptOwnershipByNonPendingOwner(address caller) public {
-        if (caller == sut.pendingOwner()) return;
-
-        // Fails with OnlyCallableByPendingOwner.
-        EVM.prank(caller);
-        sut.acceptOwnership();
     }
 
 }
