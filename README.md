@@ -4,6 +4,11 @@
 
 A small set of smart contracts.
 
+## Contracts
+
+- `Ownable` : An ownable contract using the Two-Step Transfer Pattern
+- `Whitelisted` : Implementation of a whitelist as access control mechanism
+
 ## Installation
 
 To install with [**Foundry**](https://github.com/gakonst/foundry):
@@ -12,10 +17,14 @@ To install with [**Foundry**](https://github.com/gakonst/foundry):
 forge install byterocket/solrocket
 ```
 
-To install with [**DappTools**](https://github.com/dapphub/dapptools):
+## Usage
 
-```sh
-dapp install byterocket/solrocket
+Common tasks are executed through a `Makefile`:
+```
+make help
+> build         Build project
+> clean         Remove build artifacts
+> test          Run testsuite
 ```
 
 ## Safety
