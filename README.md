@@ -18,6 +18,26 @@ To install with [**Foundry**](https://github.com/gakonst/foundry):
 forge install byterocket/solrocket
 ```
 
+## Getting Started
+
+Clone or fork `byterocket/solrocket`
+
+```sh
+git clone https://github.com/byterocket/solrocket.git
+```
+
+Install dependencies
+
+```sh
+forge install
+```
+
+Test compilation
+
+```sh
+forge build
+```
+
 ## Usage
 
 Common tasks are executed through a `Makefile`:
