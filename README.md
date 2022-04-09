@@ -6,8 +6,9 @@ A small set of smart contracts.
 
 ## Contracts
 
-- `Ownable` : An ownable contract using the Two-Step Transfer Pattern
-- `Whitelisted` : Implementation of a whitelist as access control mechanism
+-   `Ownable` : An ownable contract using the Two-Step Transfer Pattern
+-   `Whitelisted` : Implementation of a whitelist as access control mechanism
+-   `PreventReentrant` : Gas efficient implementation for reentrancy protection
 
 ## Installation
 
@@ -20,6 +21,7 @@ forge install byterocket/solrocket
 ## Usage
 
 Common tasks are executed through a `Makefile`:
+
 ```
 make help
 > build         Build project
@@ -29,8 +31,6 @@ make help
 
 ## Safety
 
-This is experimental software and is provided on an "as is" and
-"as available" basis.
+This is experimental software and is provided on an "as is" and "as available" basis.
 
-We do not give any warranties and will not be liable for any loss incurred
-through any use of this codebase.
+We do not give any warranties and will not be liable for any loss incurred through any use of this codebase.
