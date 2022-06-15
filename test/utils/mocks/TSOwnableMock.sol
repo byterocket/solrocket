@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.10;
 
-import {Ownable} from "../../../Ownable.sol";
+import {TSOwnable} from "src/TSOwnable.sol";
 
-contract OwnableMock is Ownable {
+contract TSOwnableMock is TSOwnable {
 
     constructor() {
         // NO-OP

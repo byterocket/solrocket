@@ -1,10 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.10;
 
-import "ds-test/test.sol";
-
-import "forge-std/stdlib.sol";
-import "forge-std/Vm.sol";
+import "forge-std/Test.sol";
 
 import {WhitelistedMock} from "./utils/mocks/WhitelistedMock.sol";
 
@@ -17,9 +14,7 @@ library Errors {
         = abi.encodeWithSignature("OnlyCallableByWhitelistedAddress()");
 }
 
-contract WhitelistedTest is DSTest {
-    Vm internal constant vm = Vm(HEVM_ADDRESS);
-
+contract WhitelistedTest is Test {
     // SuT
     WhitelistedMock sut;
 

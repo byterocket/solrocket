@@ -2,7 +2,7 @@
 pragma solidity 0.8.10;
 
 /**
- * @title Ownable contract using Two-Step Ownership Transfer pattern
+ * @title TSOwnable contract using Two-Step Ownership Transfer pattern
  *
  * @dev Contract module which provides a basic access controler mechanism,
  *      where there is an account (an owner) that can be granted exclusive
@@ -24,9 +24,11 @@ pragma solidity 0.8.10;
  *      This contract is heavily inspired by OpenZeppelin's `Ownable` contract.
  *      For more info see https://github.com/OpenZeppelin/openzeppelin-contracts.
  *
+ * @custom:scribble #invariant "Owner can not be zero" owner != address(0);
+ *
  * @author byterocket
  */
-abstract contract Ownable {
+abstract contract TSOwnable {
 
     //--------------------------------------------------------------------------
     // Errors
@@ -69,9 +71,23 @@ abstract contract Ownable {
     // Storage
 
     /// @notice The contract's owner.
+    ///
+    /// @custom:scribble #if_updated "Only pendingOwner can update owner"
+    ///   let isDeployment := msg.sig == bytes4(0x0) in
+    ///     isDeployment || msg.sender == old(pendingOwner);
+    ///
+    /// @custom:scribble #if_updated "Owner can only be set to pendingOwner"
+    ///   let isDeployment := msg.sig == bytes4(0x0) in
+    ///     isDeployment || owner == old(pendingOwner);
     address public owner;
 
     /// @notice The contract's pending owner.
+    ///
+    /// @custom:scribble #if_updated "Only owner can set pendingOwner"
+    ///   pendingOwner != address(0) ==> msg.sender == owner;
+    ///
+    /// @custom:scribble #if_updated "pendingOwner is set to zero if owner changes"
+    ///   owner != old(owner) ==> pendingOwner == address(0);
     address public pendingOwner;
 
     //--------------------------------------------------------------------------

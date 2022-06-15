@@ -1,12 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.10;
 
-import "ds-test/test.sol";
+import "forge-std/Test.sol";
 
-import "forge-std/stdlib.sol";
-import "forge-std/Vm.sol";
-
-import {OwnableMock} from "./utils/mocks/OwnableMock.sol";
+import {TSOwnableMock} from "./utils/mocks/TSOwnableMock.sol";
 
 /**
  * Errors library for Ownable's custom errors.
@@ -23,11 +20,9 @@ library Errors {
         = abi.encodeWithSignature("InvalidPendingOwner()");
 }
 
-contract OwnableTest is DSTest {
-    Vm internal constant vm = Vm(HEVM_ADDRESS);
-
+contract TSOwnableTest is Test {
     // SuT
-    OwnableMock sut;
+    TSOwnableMock sut;
 
     // Events copied from SuT.
     // Note that the Event declarations are needed to test for emission.
@@ -36,7 +31,7 @@ contract OwnableTest is DSTest {
     event NewOwner(address indexed previousOwner, address indexed newOwner);
 
     function setUp() public {
-        sut = new OwnableMock();
+        sut = new TSOwnableMock();
     }
 
     function testDeploymentInvariants() public {
