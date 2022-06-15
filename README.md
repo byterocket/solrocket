@@ -6,7 +6,7 @@ A small set of smart contracts.
 
 ## Contracts
 
-- `Ownable` : An ownable contract using the Two-Step Transfer Pattern
+- `TSOwnable` : An ownable contract using the Two-Step Transfer Pattern
 - `Whitelisted` : Implementation of a whitelist as access control mechanism
 
 ## Installation
