@@ -17,16 +17,6 @@ To install with [**Foundry**](https://github.com/gakonst/foundry):
 forge install byterocket/solrocket
 ```
 
-## Usage
-
-Common tasks are executed through a `Makefile`:
-```
-make help
-> build         Build project
-> clean         Remove build artifacts
-> test          Run testsuite
-```
-
 ## Safety
 
 This is experimental software and is provided on an "as is" and
